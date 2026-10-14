@@ -1,0 +1,7 @@
+impl,size,ms,gflops,max_err
+cpu_naive,256,12.7397,2.6338,0.000e+00
+cpu_reordered,256,1.1838,28.3459,0.000e+00
+cpu_naive,512,91.8019,2.9241,0.000e+00
+cpu_reordered,512,7.5145,35.7221,0.000e+00
+cpu_naive,1024,1116.0143,1.9242,0.000e+00
+cpu_reordered,1024,60.9058,35.2591,0.000e+00
