@@ -16,7 +16,9 @@ A neural network library built from scratch in C++/CUDA, with hand-optimized GPU
 
 ![Matrix multiply throughput](results/matmul_gflops.png)
 
-**MNIST:** 2-layer network (784 → 128 → 10) trained from scratch for 5 epochs reaches **96.99% test accuracy** on the 10,000 held-out test images (about 0.8 s per epoch on an Apple M5 CPU). PyTorch equivalent: ___%. Per-epoch numbers: [results/train.csv](results/train.csv).
+**MNIST:** 2-layer network (784 → 128 → 10) trained from scratch for 5 epochs reaches **96.99% test accuracy** on the 10,000 held-out test images (about 0.8 s per epoch on an Apple M5 CPU). The same network built in PyTorch reaches **96.78%** (about 0.2 s per epoch), confirming the hand-written forward and backward passes are correct. Per-epoch numbers: [results/train.csv](results/train.csv), [results/pytorch.csv](results/pytorch.csv).
+
+![C++ vs PyTorch test accuracy](results/cpp_vs_pytorch.png)
 
 Hardware: CPU results on an Apple M5 (MacBook), GPU results on an NVIDIA T4 (Google Colab). Every result is checked against a trusted reference before it is counted.
 
@@ -59,6 +61,14 @@ python3 scripts/download_mnist.py
 make run-train
 ```
 
+**PyTorch comparison:**
+
+```bash
+python3 -m venv .venv && ./.venv/bin/pip install torch numpy matplotlib
+./.venv/bin/python scripts/pytorch_baseline.py
+./.venv/bin/python scripts/plot_compare.py
+```
+
 Each benchmark checks its answer against a trusted reference (naive CPU or cuBLAS) and prints PASS or FAIL, so a fast but wrong kernel never counts.
 
 ## Roadmap
@@ -73,7 +83,7 @@ Each benchmark checks its answer against a trusted reference (naive CPU or cuBLA
 - [x] Forward pass: linear, ReLU, softmax, cross-entropy loss
 - [x] Backward pass and SGD update; loss falls from about 2.30
 - [x] ~95%+ test accuracy on MNIST
-- [ ] Same model in PyTorch for comparison
+- [x] Same model in PyTorch for comparison
 - [ ] "How it works" section written
 
 **Next steps**
