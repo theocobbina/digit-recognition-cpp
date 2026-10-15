@@ -5,7 +5,7 @@
 #include <vector>
 
 // Row-major matrix: element (r, c) lives at data[r * cols + c].
-// Every kernel in this project (CPU and GPU) uses this same layout.
+// Every function in this project uses this same layout.
 struct Matrix {
     int rows = 0;
     int cols = 0;

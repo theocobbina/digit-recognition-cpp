@@ -1,4 +1,4 @@
-"""Plot GFLOPS for every implementation in results/cpu.csv and results/gpu.csv.
+"""Plot GFLOPS for each matrix-multiply version in results/cpu.csv.
 
 Saves results/matmul_gflops.png, the main chart for the README.
 """
@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 results = Path(__file__).resolve().parent.parent / "results"
 series = defaultdict(list)  # impl -> [(size, gflops)]
 
-for name in ("cpu.csv", "gpu.csv"):
+for name in ("cpu.csv",):
     path = results / name
     if not path.exists():
         print(f"Skipping {name} (not found)")
@@ -40,7 +40,7 @@ ax.set_xscale("log", base=2)
 ax.set_yscale("log")
 ax.set_xlabel("Matrix size N (N x N)")
 ax.set_ylabel("Throughput (GFLOPS, log scale)")
-ax.set_title("KernelNet matrix multiply: CPU vs GPU vs cuBLAS")
+ax.set_title("Matrix multiply: naive vs cache-friendly loop order")
 ax.grid(True, which="both", alpha=0.3)
 ax.legend()
 fig.tight_layout()

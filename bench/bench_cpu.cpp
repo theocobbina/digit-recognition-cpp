@@ -32,7 +32,7 @@ int main() {
 
     FILE* csv = std::fopen("results/cpu.csv", "w");
     if (!csv) {
-        std::fprintf(stderr, "Could not open results/cpu.csv (run from the kernelnet folder)\n");
+        std::fprintf(stderr, "Could not open results/cpu.csv (run from the project folder)\n");
         return 1;
     }
     std::fprintf(csv, "impl,size,ms,gflops,max_err\n");

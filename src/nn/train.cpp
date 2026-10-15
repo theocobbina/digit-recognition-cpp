@@ -153,7 +153,7 @@ int main() {
 
     FILE* csv = std::fopen("results/train.csv", "w");
     if (!csv) {
-        std::fprintf(stderr, "Could not open results/train.csv (run from the kernelnet folder)\n");
+        std::fprintf(stderr, "Could not open results/train.csv (run from the project folder)\n");
         return 1;
     }
     std::fprintf(csv, "epoch,loss,train_acc,test_acc,seconds\n");

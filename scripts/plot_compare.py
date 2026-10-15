@@ -22,7 +22,7 @@ def load(name):
 
 fig, ax = plt.subplots(figsize=(7, 4.5))
 for name, label, color in [
-    ("train.csv", "C++ from scratch (KernelNet)", "#2a6fdb"),
+    ("train.csv", "C++ from scratch", "#2a6fdb"),
     ("pytorch.csv", "PyTorch (same network)", "#e8710a"),
 ]:
     epochs, acc = load(name)

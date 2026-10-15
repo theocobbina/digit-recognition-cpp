@@ -1,8 +1,8 @@
-"""Train the same 2-layer network in PyTorch, as a check on KernelNet's from-scratch version.
+"""Train the same 2-layer network in PyTorch, as a check on the from-scratch C++ version.
 
 Same architecture (784 -> 128 -> ReLU -> 10), loss, optimizer, batch size, learning rate
 and epoch count as src/nn/train.cpp. Writes results/pytorch.csv.
-Run after scripts/download_mnist.py (Colab has PyTorch installed).
+Run after scripts/download_mnist.py.
 """
 
 import time
