@@ -2,23 +2,23 @@
 
 A neural network library built from scratch in C++/CUDA, with hand-optimized GPU kernels benchmarked against cuBLAS and PyTorch.
 
-> Status: in progress. Results below are filled in as each stage is finished.
+> Status: in progress. CPU and MNIST results are in; GPU results are next.
 
 ## Results
 
 | Implementation | 1024 x 1024 time (ms) | GFLOPS | Speedup vs CPU naive |
 | --- | --- | --- | --- |
-| CPU naive | | | 1x |
-| CPU loop-reordered | | | |
+| CPU naive | 1,116 | 1.9 | 1x |
+| CPU loop-reordered | 60.9 | 35.3 | 18x |
 | GPU naive | | | |
 | GPU tiled (shared memory) | | | |
 | cuBLAS (reference) | | | |
 
 ![Matrix multiply throughput](results/matmul_gflops.png)
 
-**MNIST:** 2-layer network, test accuracy: ___%  (PyTorch equivalent: ___%)
+**MNIST:** 2-layer network (784 → 128 → 10) trained from scratch for 5 epochs reaches **96.99% test accuracy** on the 10,000 held-out test images (about 0.8 s per epoch on an Apple M5 CPU). PyTorch equivalent: ___%. Per-epoch numbers: [results/train.csv](results/train.csv).
 
-Hardware: NVIDIA T4 (Google Colab), CPU: ___
+Hardware: CPU results on an Apple M5 (MacBook), GPU results on an NVIDIA T4 (Google Colab). Every result is checked against a trusted reference before it is counted.
 
 ## How it works
 
@@ -64,15 +64,15 @@ Each benchmark checks its answer against a trusted reference (naive CPU or cuBLA
 ## Roadmap
 
 **Day 1: matrix multiply**
-- [ ] `matmul_cpu_reordered` in `src/cpu/matmul_cpu.cpp` passes and beats naive
+- [x] `matmul_cpu_reordered` in `src/cpu/matmul_cpu.cpp` passes and beats naive
 - [ ] `matmul_naive_kernel` in `src/gpu/matmul_gpu.cu` passes
 - [ ] `matmul_tiled_kernel` passes and beats the naive kernel
 - [ ] Benchmark chart generated and results table filled in
 
 **Day 2: neural network**
-- [ ] Forward pass: linear, ReLU, softmax, cross-entropy loss
-- [ ] Backward pass and SGD update; loss falls from about 2.30
-- [ ] ~95%+ test accuracy on MNIST
+- [x] Forward pass: linear, ReLU, softmax, cross-entropy loss
+- [x] Backward pass and SGD update; loss falls from about 2.30
+- [x] ~95%+ test accuracy on MNIST
 - [ ] Same model in PyTorch for comparison
 - [ ] "How it works" section written
 

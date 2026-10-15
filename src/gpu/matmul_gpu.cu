@@ -5,16 +5,17 @@
 // Kernel 1: naive. One thread computes one element C[row][col].
 // ---------------------------------------------------------------------------
 __global__ void matmul_naive_kernel(const float* A, const float* B, float* C, int M, int N, int K) {
-    // TODO(Day 1):
-    //  1. Work out which element this thread owns:
-    //       row = blockIdx.y * blockDim.y + threadIdx.y
-    //       col = blockIdx.x * blockDim.x + threadIdx.x
-    //  2. The grid is rounded up, so some threads fall outside the matrix.
-    //     Return early if row >= M or col >= N.
-    //  3. Loop k from 0 to K, accumulate A[row*K + k] * B[k*N + col], write C[row*N + col].
-    //
     // Interview question: every thread reads a full row of A and a full column of B
-    // from global memory. How many times is each element of A read in total?
+    // from global memory. How many times is each element of A read in total? (N times)
+    int row = blockIdx.y * blockDim.y + threadIdx.y;
+    int col = blockIdx.x * blockDim.x + threadIdx.x;
+    if (row >= M || col >= N) return;  // the grid is rounded up past the matrix edge
+
+    float sum = 0.0f;
+    for (int k = 0; k < K; ++k) {
+        sum += A[row * K + k] * B[k * N + col];
+    }
+    C[row * N + col] = sum;
 }
 
 void launch_matmul_naive(const float* dA, const float* dB, float* dC, int M, int N, int K) {
@@ -31,22 +32,31 @@ void launch_matmul_naive(const float* dA, const float* dB, float* dC, int M, int
 constexpr int TILE = 16;
 
 __global__ void matmul_tiled_kernel(const float* A, const float* B, float* C, int M, int N, int K) {
-    // TODO(Day 1):
-    //  1. Declare the shared tiles:
-    //       __shared__ float As[TILE][TILE];
-    //       __shared__ float Bs[TILE][TILE];
-    //  2. Compute row/col as in the naive kernel (block size is TILE x TILE).
-    //  3. Loop over tiles t = 0 .. ceil(K / TILE):
-    //       a. Each thread loads ONE element of A's tile and ONE of B's tile:
-    //            As[ty][tx] = A[row * K + (t*TILE + tx)]   (0.0f if out of bounds)
-    //            Bs[ty][tx] = B[(t*TILE + ty) * N + col]   (0.0f if out of bounds)
-    //       b. __syncthreads();   // wait until the whole tile is loaded
-    //       c. for k in 0..TILE: sum += As[ty][k] * Bs[k][tx];
-    //       d. __syncthreads();   // wait before the next loop overwrites the tiles
-    //  4. If row < M and col < N, write C[row * N + col] = sum.
-    //
     // Interview questions: why are both __syncthreads() calls needed?
     // Why does this cut global-memory traffic by about TILE times?
+    __shared__ float As[TILE][TILE];
+    __shared__ float Bs[TILE][TILE];
+
+    int tx = threadIdx.x, ty = threadIdx.y;
+    int row = blockIdx.y * TILE + ty;
+    int col = blockIdx.x * TILE + tx;
+
+    float sum = 0.0f;
+    for (int t = 0; t < (K + TILE - 1) / TILE; ++t) {
+        // Each thread loads one element of each tile; zeros pad past the matrix edge.
+        int a_col = t * TILE + tx;
+        int b_row = t * TILE + ty;
+        As[ty][tx] = (row < M && a_col < K) ? A[row * K + a_col] : 0.0f;
+        Bs[ty][tx] = (b_row < K && col < N) ? B[b_row * N + col] : 0.0f;
+        __syncthreads();  // whole tile loaded before anyone reads it
+
+        for (int k = 0; k < TILE; ++k) {
+            sum += As[ty][k] * Bs[k][tx];
+        }
+        __syncthreads();  // everyone done reading before the next tile overwrites it
+    }
+
+    if (row < M && col < N) C[row * N + col] = sum;
 }
 
 void launch_matmul_tiled(const float* dA, const float* dB, float* dC, int M, int N, int K) {
