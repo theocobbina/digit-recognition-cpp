@@ -189,5 +189,23 @@ int main() {
     }
     std::fclose(csv);
     std::printf("\nWrote results/train.csv\n");
+
+    // Demo: draw a few test images the network never trained on, with its guess.
+    const char* shades = " .:-=+*#%@";  // darker pixel -> denser character
+    for (int idx : {0, 1, 2, 3, 4}) {
+        Matrix x(1, kInput);
+        std::copy_n(&X_test.data[static_cast<size_t>(idx) * kInput], kInput, x.data.data());
+        Matrix Z1, H;
+        Matrix p = forward(net, x, Z1, H);
+        int guess = static_cast<int>(std::max_element(p.data.begin(), p.data.end()) - p.data.begin());
+
+        std::printf("\nTest image #%d   correct answer: %d   network's guess: %d (%.1f%% sure)  %s\n",
+                    idx, y_test[idx], guess, 100.0f * p.data[guess], guess == y_test[idx] ? "RIGHT" : "WRONG");
+        for (int r = 2; r < 26; r += 2) {  // skip blank border rows; every other row keeps the shape square
+            std::printf("    ");
+            for (int c = 2; c < 26; ++c) std::putchar(shades[static_cast<int>(x.at(0, r * 28 + c) * 9.99f)]);
+            std::printf("\n");
+        }
+    }
     return 0;
 }
